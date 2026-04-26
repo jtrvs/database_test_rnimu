@@ -14,8 +14,8 @@ CREATE TABLE Project (
 
 -- 3. Диагнозы (справочник МКБ-10)
 CREATE TABLE Diagnosis (
-    diagnosis_code VARCHAR(10) PRIMARY KEY,   -- Q85.0
-    diagnosis_description VARCHAR(255)
+    diagnosis_id INT PRIMARY KEY AUTO_INCREMENT,  -- суррогатный PK
+    diagnosis_code VARCHAR(10) NOT NULL UNIQUE,   -- код МКБ-10 (Q85.0, E84.0...)
 );
 
 -- 4. Пациент
@@ -57,7 +57,7 @@ CREATE TABLE Analysis (
    patient_uuid CHAR(36) NOT NULL,
    run_number VARCHAR(100) NOT NULL,
    project_id INT,
-   diagnosis_code VARCHAR(10),
+   diagnosis_id INT,
    phenotype TEXT,                           -- Фенотип
    presumed_diagnosis VARCHAR(255),          -- Текстовый диагноз
    pipeline VARCHAR(100),                    -- dorado+modkit
@@ -72,5 +72,5 @@ CREATE TABLE Analysis (
    FOREIGN KEY (patient_uuid) REFERENCES Patient(patient_uuid),
    FOREIGN KEY (run_number) REFERENCES SequencingRun(run_number),
    FOREIGN KEY (project_id) REFERENCES Project(project_id),
-   FOREIGN KEY (diagnosis_code) REFERENCES Diagnosis(diagnosis_code)
+   FOREIGN KEY (diagnosis_id) REFERENCES Diagnosis(diagnosis_id)
 );
