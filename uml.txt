@@ -1,0 +1,91 @@
+@startuml
+!theme plain
+
+title ER-диаграмма генетической базы данных
+
+' Определение сущностей
+entity Family {
+  * family_id : INT <<PK>>
+  --
+  family_code : VARCHAR(50) <<UK>>
+  is_consanguineous : BOOLEAN
+}
+
+entity Project {
+  * project_id : INT <<PK>>
+  --
+  project_name : VARCHAR(100) <<UK>>
+}
+
+entity Diagnosis {
+  * diagnosis_id : INT <<PK>>
+  --
+  diagnosis_code : VARCHAR(10) <<UK>>
+  diagnosis_description : VARCHAR(255)
+}
+
+entity Partner {
+  * partner_id : INT <<PK>>
+  --
+  partner_name : VARCHAR(255) <<UK>>
+}
+
+entity Patient {
+  * patient_uuid : CHAR(36) <<PK>>
+  --
+  * uin1 : VARCHAR(50) <<UK>>
+  sex : ENUM('XX','XY')
+  full_name : VARCHAR(255)
+  birth_date : DATE
+  relationship : VARCHAR(20)
+  card_number : VARCHAR(50)
+  admission_date : DATE
+  --
+  family_id : INT <<FK>>
+  partner_id : INT <<FK>>
+}
+
+entity ParentChild {
+  * child_uuid : CHAR(36) <<PK, FK>>
+  * parent_uuid : CHAR(36) <<PK, FK>>
+}
+
+entity SequencingRun {
+  * run_id : INT <<PK>>
+  --
+  run_number : VARCHAR(100) <<UK>>
+  sequencing_type : VARCHAR(50)
+  date_sequencing : DATE
+  file_path : TEXT
+}
+
+entity Analysis {
+  * analysis_id : INT <<PK>>
+  --
+  phenotype : TEXT
+  pipeline : VARCHAR(100)
+  reference_genome : VARCHAR(50)
+  mean_coverage : DECIMAL(10,2)
+  coverage_percent : DECIMAL(10,5)
+  reads_count : BIGINT
+  uniformity : DECIMAL(10,5)
+  date_analysis : DATE
+  deadline : DATE
+  results_shared : BOOLEAN
+  --
+  patient_uuid : CHAR(36) <<FK>>
+  run_id : INT <<FK>>
+  project_id : INT <<FK>>
+  diagnosis_id : INT <<FK>>
+}
+
+' Связи
+Family ||--o{ Patient : "has"
+Partner ||--o{ Patient : "references"
+Patient ||--o{ ParentChild : "child"
+Patient ||--o{ ParentChild : "parent"
+SequencingRun ||--o{ Analysis : "used in"
+Project ||--o{ Analysis : "categorizes"
+Diagnosis ||--o{ Analysis : "assigned"
+Patient ||--o{ Analysis : "performed on"
+@enduml
